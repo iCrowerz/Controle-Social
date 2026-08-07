@@ -5,9 +5,7 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
-// Aguarda o Firebase confirmar se existe um usuário conectado.
 onAuthStateChanged(auth, (usuario) => {
-  // Se não houver usuário conectado, envia para a tela de login.
   if (!usuario) {
     window.location.replace("./login.html");
     return;
@@ -17,7 +15,6 @@ onAuthStateChanged(auth, (usuario) => {
 });
 
 function criarBotaoSair(usuario) {
-  // Evita criar o botão mais de uma vez.
   if (document.getElementById("controleSessao")) {
     return;
   }
@@ -25,65 +22,42 @@ function criarBotaoSair(usuario) {
   const controle = document.createElement("div");
   controle.id = "controleSessao";
 
-  controle.innerHTML = `
-    <span id="usuarioLogado"></span>
-    <button id="botaoSair" type="button">Sair</button>
-  `;
+  controle.style.position = "fixed";
+  controle.style.right = "15px";
+  controle.style.bottom = "15px";
+  controle.style.zIndex = "99999";
+  controle.style.padding = "10px";
+  controle.style.borderRadius = "10px";
+  controle.style.background = "#111827";
+  controle.style.color = "#ffffff";
+  controle.style.fontFamily = "Arial, sans-serif";
 
-  Object.assign(controle.style, {
-    position: "fixed",
-    right: "16px",
-    bottom: "16px",
-    zIndex: "99999",
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    padding: "10px 12px",
-    borderRadius: "10px",
-    background: "#111827",
-    color: "#ffffff",
-    boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)",
-    fontFamily: "Arial, sans-serif"
-  });
+  const email = document.createElement("span");
+  email.textContent = usuario.email || "Usuário conectado";
+  email.style.marginRight = "12px";
+  email.style.fontSize = "13px";
 
-  document.body.appendChild(controle);
-
-  const usuarioLogado = document.getElementById("usuarioLogado");
-  const botaoSair = document.getElementById("botaoSair");
-
-  usuarioLogado.textContent = usuario.email || "Usuário conectado";
-
-  Object.assign(usuarioLogado.style, {
-    fontSize: "12px",
-    maxWidth: "200px",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap"
-  });
-
-  Object.assign(botaoSair.style, {
-    border: "none",
-    borderRadius: "7px",
-    padding: "8px 13px",
-    background: "#dc2626",
-    color: "#ffffff",
-    fontWeight: "bold",
-    cursor: "pointer"
-  });
+  const botaoSair = document.createElement("button");
+  botaoSair.type = "button";
+  botaoSair.textContent = "Sair";
+  botaoSair.style.padding = "8px 14px";
+  botaoSair.style.border = "none";
+  botaoSair.style.borderRadius = "7px";
+  botaoSair.style.background = "#dc2626";
+  botaoSair.style.color = "#ffffff";
+  botaoSair.style.cursor = "pointer";
 
   botaoSair.addEventListener("click", async () => {
-    botaoSair.disabled = true;
-    botaoSair.textContent = "Saindo...";
-
     try {
       await signOut(auth);
       window.location.replace("./login.html");
     } catch (erro) {
       console.error("Erro ao sair:", erro);
-      alert("Não foi possível sair do sistema.");
-
-      botaoSair.disabled = false;
-      botaoSair.textContent = "Sair";
+      alert("Não foi possível sair.");
     }
   });
+
+  controle.appendChild(email);
+  controle.appendChild(botaoSair);
+  document.body.appendChild(controle);
 }
