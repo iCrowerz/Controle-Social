@@ -9,10 +9,10 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
-// Guarda os dados do usuário atual.
+console.log("permissoes.js carregado");
+
 let usuarioAtual = null;
 
-// Função que busca o perfil do usuário no Firestore.
 async function buscarPerfil(uid) {
   const referencia = doc(db, "usuarios", uid);
 
@@ -28,20 +28,42 @@ async function buscarPerfil(uid) {
   };
 }
 
-// Aguarda o Firebase descobrir quem está logado.
-onAuthStateChanged(auth, async (usuario) => {
+function aplicarPermissoes(perfil) {
+  console.log("Perfil encontrado:", perfil);
+  console.log("Nível de acesso:", perfil.role);
 
-  if (!usuario) {
+  if (perfil.ativo === false) {
+    alert("Seu usuário está desativado.");
     return;
   }
 
-  try {
+  if (perfil.role === "master") {
+    console.log("Acesso MASTER liberado");
 
+    document.body.classList.add("usuario-master");
+    return;
+  }
+
+  console.log("Acesso somente visualização");
+
+  document.body.classList.add("usuario-visualizador");
+}
+
+onAuthStateChanged(auth, async (usuario) => {
+  if (!usuario) {
+    console.log("Nenhum usuário autenticado");
+    return;
+  }
+
+  console.log("Usuário autenticado:", usuario.email);
+  console.log("UID:", usuario.uid);
+
+  try {
     const perfil = await buscarPerfil(usuario.uid);
 
     if (!perfil) {
       console.error(
-        "Usuário autenticado, mas sem perfil no Firestore."
+        "Usuário logado, mas não existe perfil na coleção usuarios."
       );
 
       return;
@@ -49,64 +71,15 @@ onAuthStateChanged(auth, async (usuario) => {
 
     usuarioAtual = perfil;
 
-    console.log(
-      "Perfil carregado:",
-      usuarioAtual
-    );
-
-    aplicarPermissoes(usuarioAtual);
+    aplicarPermissoes(perfil);
 
   } catch (erro) {
-
     console.error(
-      "Erro ao carregar permissões:",
+      "Erro ao buscar perfil no Firestore:",
       erro
     );
-
   }
-
 });
-
-// Aplica as permissões visuais.
-function aplicarPermissoes(perfil) {
-
-  console.log(
-    "Nível de acesso:",
-    perfil.role
-  );
-
-  if (perfil.ativo === false) {
-
-    alert(
-      "Seu acesso ao sistema está desativado."
-    );
-
-    return;
-  }
-
-  if (perfil.role === "master") {
-
-    console.log(
-      "Acesso MASTER liberado."
-    );
-
-    document.body.classList.add(
-      "usuario-master"
-    );
-
-  } else {
-
-    console.log(
-      "Acesso somente para visualização."
-    );
-
-    document.body.classList.add(
-      "usuario-visualizador"
-    );
-
-  }
-
-}
 
 export {
   usuarioAtual,
