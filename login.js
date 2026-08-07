@@ -1,4 +1,4 @@
-import { auth } from "../firebase.js";
+import {auth} from "./firebase.js";
 
 import {
   browserLocalPersistence,
@@ -10,64 +10,78 @@ import {
 const formLogin = document.getElementById("formLogin");
 const campoEmail = document.getElementById("email");
 const campoSenha = document.getElementById("senha");
-const botaoEntrar = document.getElementById("entrar");
-const botaoAlternarSenha = document.getElementById("alternarSenha");
+const botaoEntrar = document.getElementById("botaoEntrar");
+const botaoMostrarSenha = document.getElementById("mostrarSenha");
 const mensagem = document.getElementById("mensagem");
 
-// Se a pessoa já estiver conectada, não precisa ver o login novamente.
+// Se o usuário já estiver conectado, vai direto para o sistema.
 onAuthStateChanged(auth, (usuario) => {
   if (usuario) {
     window.location.replace("./index.html");
   }
 });
 
-// Mostra ou esconde a senha.
-botaoAlternarSenha.addEventListener("click", () => {
-  const senhaEstaOculta = campoSenha.type === "password";
+botaoMostrarSenha.addEventListener("click", () => {
+  const senhaEstaEscondida = campoSenha.type === "password";
 
-  campoSenha.type = senhaEstaOculta ? "text" : "password";
-  botaoAlternarSenha.textContent = senhaEstaOculta
+  campoSenha.type = senhaEstaEscondida
+    ? "text"
+    : "password";
+
+  botaoMostrarSenha.textContent = senhaEstaEscondida
     ? "Ocultar"
     : "Mostrar";
 });
 
-// Mostra uma mensagem abaixo do formulário.
-function mostrarMensagem(texto, tipo = "erro") {
+function mostrarMensagem(texto, tipo) {
   mensagem.textContent = texto;
   mensagem.className = tipo;
 }
 
-// Remove a mensagem anterior.
 function limparMensagem() {
   mensagem.textContent = "";
   mensagem.className = "";
 }
 
-// Traduz alguns erros comuns do Firebase.
-function traduzirErroLogin(codigo) {
-  const mensagens = {
-    "auth/invalid-email": "O endereço de e-mail não é válido.",
-    "auth/missing-password": "Digite sua senha.",
-    "auth/invalid-credential": "E-mail ou senha incorretos.",
-    "auth/user-disabled": "Este usuário está desativado.",
+function traduzirErro(codigo) {
+  const erros = {
+    "auth/invalid-email":
+      "O e-mail digitado não é válido.",
+
+    "auth/missing-password":
+      "Digite sua senha.",
+
+    "auth/invalid-credential":
+      "E-mail ou senha incorretos.",
+
+    "auth/user-disabled":
+      "Este usuário foi desativado.",
+
     "auth/too-many-requests":
-      "Muitas tentativas foram realizadas. Aguarde e tente novamente.",
+      "Muitas tentativas. Aguarde um pouco e tente novamente.",
+
     "auth/network-request-failed":
-      "Não foi possível conectar. Verifique sua internet."
+      "Falha de conexão. Verifique sua internet."
   };
 
-  return mensagens[codigo] || "Não foi possível entrar no sistema.";
+  return erros[codigo] ||
+    "Não foi possível entrar no sistema.";
 }
 
 formLogin.addEventListener("submit", async (evento) => {
   evento.preventDefault();
+
   limparMensagem();
 
   const email = campoEmail.value.trim();
   const senha = campoSenha.value;
 
   if (!email || !senha) {
-    mostrarMensagem("Preencha o e-mail e a senha.");
+    mostrarMensagem(
+      "Preencha o e-mail e a senha.",
+      "erro"
+    );
+
     return;
   }
 
@@ -75,18 +89,30 @@ formLogin.addEventListener("submit", async (evento) => {
   botaoEntrar.textContent = "Entrando...";
 
   try {
-    // Mantém o usuário conectado mesmo se atualizar ou fechar o navegador.
-    await setPersistence(auth, browserLocalPersistence);
+    await setPersistence(
+      auth,
+      browserLocalPersistence
+    );
 
-    await signInWithEmailAndPassword(auth, email, senha);
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      senha
+    );
 
-    mostrarMensagem("Login realizado com sucesso.", "sucesso");
+    mostrarMensagem(
+      "Login realizado com sucesso.",
+      "sucesso"
+    );
 
     window.location.replace("./index.html");
   } catch (erro) {
-    console.error("Erro ao realizar login:", erro);
+    console.error("Erro no login:", erro);
 
-    mostrarMensagem(traduzirErroLogin(erro.code));
+    mostrarMensagem(
+      traduzirErro(erro.code),
+      "erro"
+    );
   } finally {
     botaoEntrar.disabled = false;
     botaoEntrar.textContent = "Entrar";
