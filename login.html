@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Login | Controle Social</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, #805ad5 0%, transparent 35%),
+        linear-gradient(135deg, #111827, #312e81);
+      color: #111827;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: 20px;
+      padding: 36px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1f2937;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .subtitulo {
+      text-align: center;
+      color: #6b7280;
+      line-height: 1.5;
+      margin-bottom: 28px;
+    }
+
+    .campo {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      color: #374151;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      height: 48px;
+      padding: 0 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      background: white;
+      color: #111827;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+    }
+
+    .campo-senha {
+      position: relative;
+    }
+
+    .campo-senha input {
+      padding-right: 76px;
+    }
+
+    #alternarSenha {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      color: #4f46e5;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #entrar {
+      width: 100%;
+      min-height: 50px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    #entrar:hover {
+      transform: translateY(-1px);
+    }
+
+    #entrar:disabled {
+      cursor: wait;
+      opacity: 0.7;
+      transform: none;
+    }
+
+    #mensagem {
+      display: none;
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 9px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    #mensagem.erro {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    #mensagem.sucesso {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .rodape {
+      margin-top: 24px;
+      text-align: center;
+      color: #9ca3af;
+      font-size: 12px;
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 28px 22px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="login-container">
+    <div class="logo" aria-hidden="true">CS</div>
+
+    <h1>Controle Social</h1>
+
+    <p class="subtitulo">
+      Entre com suas credenciais para acessar o sistema.
+    </p>
+
+    <form id="formLogin">
+      <div class="campo">
+        <label for="email">E-mail</label>
+
+        <input
+          id="email"
+          name="email"
+          type="email"
+          autocomplete="username"
+          placeholder="Digite seu e-mail"
+          required
+        >
+      </div>
+
+      <div class="campo">
+        <label for="senha">Senha</label>
+
+        <div class="campo-senha">
+          <input
+            id="senha"
+            name="senha"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Digite sua senha"
+            minlength="6"
+            required
+          >
+
+          <button
+            id="alternarSenha"
+            type="button"
+            aria-label="Mostrar ou ocultar senha"
+          >
+            Mostrar
+          </button>
+        </div>
+      </div>
+
+      <button id="entrar" type="submit">
+        Entrar
+      </button>
+
+      <p id="mensagem" role="alert"></p>
+    </form>
+
+    <p class="rodape">
+      Acesso restrito a usuários autorizados.
+    </p>
+  </main>
+
+  <script type="module" src="./login.js"></script>
+</body>
+</html>
