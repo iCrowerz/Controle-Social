@@ -1,8 +1,6 @@
 import { auth } from "./firebase.js";
 
-import {
-  signInWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import {signInWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 const formulario = document.getElementById("formLogin");
 const campoEmail = document.getElementById("email");
