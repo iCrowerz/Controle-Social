@@ -1,97 +1,84 @@
 import { auth } from "./firebase.js";
 
-import {signInWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import {
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 const formulario = document.getElementById("formLogin");
 const campoEmail = document.getElementById("email");
 const campoSenha = document.getElementById("senha");
 const botaoEntrar = document.getElementById("botaoEntrar");
-const botaoMostrarSenha = document.getElementById("mostrarSenha");
 const mensagem = document.getElementById("mensagem");
 
-// Mostrar ou esconder a senha.
-botaoMostrarSenha.addEventListener("click", () => {
-  const senhaEstaOculta = campoSenha.type === "password";
+console.log("login.js carregado corretamente");
 
-  campoSenha.type = senhaEstaOculta ? "text" : "password";
-  botaoMostrarSenha.textContent = senhaEstaOculta
-    ? "Ocultar"
-    : "Mostrar";
-});
+if (
+  !formulario ||
+  !campoEmail ||
+  !campoSenha ||
+  !botaoEntrar ||
+  !mensagem
+) {
+  console.error(
+    "Algum elemento do login.html não foi encontrado."
+  );
+} else {
+  formulario.addEventListener("submit", async (evento) => {
+    // Impede o navegador de colocar os dados na URL.
+    evento.preventDefault();
 
-// Mostra mensagens na tela.
-function mostrarMensagem(texto, tipo = "erro") {
-  mensagem.textContent = texto;
-  mensagem.className = tipo;
+    const email = campoEmail.value.trim();
+    const senha = campoSenha.value;
+
+    mensagem.textContent = "";
+    mensagem.className = "";
+
+    botaoEntrar.disabled = true;
+    botaoEntrar.textContent = "Entrando...";
+
+    try {
+      const credencial = await signInWithEmailAndPassword(
+        auth,
+        email,
+        senha
+      );
+
+      console.log(
+        "Login realizado:",
+        credencial.user.email
+      );
+
+      mensagem.textContent =
+        "Login realizado com sucesso.";
+
+      mensagem.className = "sucesso";
+
+      window.location.replace("./index.html");
+    } catch (erro) {
+      console.error("Erro no login:", erro);
+
+      if (erro.code === "auth/invalid-credential") {
+        mensagem.textContent =
+          "E-mail ou senha incorretos.";
+      } else if (
+        erro.code === "auth/operation-not-allowed"
+      ) {
+        mensagem.textContent =
+          "O login por e-mail e senha não está ativado.";
+      } else if (
+        erro.code === "auth/network-request-failed"
+      ) {
+        mensagem.textContent =
+          "Erro de conexão. Verifique sua internet.";
+      } else {
+        mensagem.textContent =
+          `Erro ao entrar: ${erro.code}`;
+      }
+
+      mensagem.className = "erro";
+
+      botaoEntrar.disabled = false;
+      botaoEntrar.textContent = "Entrar";
+    }
+  });
 }
-
-// Traduz erros comuns do Firebase.
-function traduzirErro(codigo) {
-  const mensagens = {
-    "auth/invalid-email": "O e-mail digitado não é válido.",
-    "auth/invalid-credential": "E-mail ou senha incorretos.",
-    "auth/user-disabled": "Este usuário está desativado.",
-    "auth/missing-password": "Digite sua senha.",
-    "auth/too-many-requests":
-      "Muitas tentativas. Aguarde um pouco e tente novamente.",
-    "auth/network-request-failed":
-      "Falha de conexão. Verifique sua internet.",
-    "auth/operation-not-allowed":
-      "O login por e-mail e senha não está ativado no Firebase."
-  };
-
-  return mensagens[codigo] || `Erro no login: ${codigo}`;
-}
-
-// Evento executado ao enviar o formulário.
-formulario.addEventListener("submit", async (evento) => {
-  evento.preventDefault();
-
-  const email = campoEmail.value.trim();
-  const senha = campoSenha.value;
-
-  mensagem.textContent = "";
-  mensagem.className = "";
-
-  if (!email || !senha) {
-    mostrarMensagem("Preencha o e-mail e a senha.");
-    return;
-  }
-
-  botaoEntrar.disabled = true;
-  botaoEntrar.textContent = "Entrando...";
-
-  try {
-    const resultado = await signInWithEmailAndPassword(
-      auth,
-      email,
-      senha
-    );
-
-    console.log(
-      "Usuário conectado:",
-      resultado.user.email
-    );
-
-    mostrarMensagem(
-      "Login realizado! Abrindo o sistema...",
-      "sucesso"
-    );
-
-    // Pequeno intervalo apenas para mostrar a mensagem.
-    setTimeout(() => {
-      window.location.href =
-        "https://icrowerz.github.io/Controle-Social/index.html";
-    }, 700);
-  } catch (erro) {
-    console.error("Erro completo do Firebase:", erro);
-
-    mostrarMensagem(
-      traduzirErro(erro.code),
-      "erro"
-    );
-
-    botaoEntrar.disabled = false;
-    botaoEntrar.textContent = "Entrar";
-  }
-});
